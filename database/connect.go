@@ -10,7 +10,7 @@ import (
 	"gorm.io/gorm"
 )
 
-func ConnectDB() {
+func ConnectDB() *gorm.DB {
 
 	dsn := fmt.Sprintf("postgres://%s:%s@%s:%s/%s",
 		config.Config("dbUser"),
@@ -27,5 +27,5 @@ func ConnectDB() {
 	log.Println("Connected to the database.")
 	db.AutoMigrate(&entity.User{})
 
-	DB = db
+	return db 
 }
