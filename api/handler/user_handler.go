@@ -1,18 +1,17 @@
 package handler
 
 import (
-	"fib/database"
-	dto "fib/dto/user"
-	"fib/entity"
-	"fib/repository"
-	"fib/service"
-	"fib/util"
-	"github.com/gofiber/fiber/v2"
+	"fib/api/presenter"
+	"fib/pkg/entity"
+	"fib/pkg/repository"
+	"fib/pkg/service"
 	"strconv"
+
+	"github.com/go-playground/validator/v10"
+	"github.com/gofiber/fiber/v2"
 )
 
 func GetUser(userService service.UserService) fiber.Handler {
-
 	return func(c *fiber.Ctx) error {
 		id, err := strconv.ParseInt(c.Params("id"), 10, 64)
 
@@ -50,11 +49,17 @@ func GetUser(userService service.UserService) fiber.Handler {
 
 func CreateUser(userService service.UserService) fiber.Handler {
 	return func(c *fiber.Ctx) error {
-		db := database.DB
-		userDto := new(dto.SignupUserDataDto)
+		userDto := new(struct {
+			Username  string `json:"username" validate:"required"`
+			Password  string `json:"password" validate:"required"`
+			FirstName string `json:"first_name" validate:"required"`
+			LastName  string `json:"last_name" validate:"required"`
+		})
 
 		bodyParserError := c.BodyParser(userDto)
-		validationError := util.Validator.Struct(userDto)
+		validationError := validator.New(
+			validator.WithRequiredStructEnabled(),
+		).Struct(userDto)
 
 		var err error
 
@@ -86,9 +91,14 @@ func CreateUser(userService service.UserService) fiber.Handler {
 		}
 
 		userDto.Password = hash
-		userEntity := toEnity(userDto)
+		userEntity := entity.User{
+			Username:  userDto.Username,
+			Password:  userDto.Password,
+			FirstName: userDto.FirstName,
+			LastName:  userDto.LastName,
+		}
 
-		if err := db.Create(&userEntity).Error; err != nil {
+		if err := userService.CreateUser(userEntity); err != nil {
 			return c.Status(fiber.StatusInternalServerError).JSON(
 				fiber.Map{
 					"status":  "error",
@@ -98,7 +108,7 @@ func CreateUser(userService service.UserService) fiber.Handler {
 			)
 		}
 
-		userResponseDto := dto.UserResponseDto{
+		userResponseDto := presenter.UserResponseDto{
 			Username:  userDto.Username,
 			FirstName: userDto.FirstName,
 			LastName:  userDto.LastName,
@@ -111,14 +121,5 @@ func CreateUser(userService service.UserService) fiber.Handler {
 				"data":    userResponseDto,
 			},
 		)
-	}
-}
-
-func toEnity(dto *dto.SignupUserDataDto) entity.User {
-	return entity.User{
-		Username:  dto.Username,
-		Password:  dto.Password,
-		FirstName: dto.FirstName,
-		LastName:  dto.LastName,
 	}
 }
