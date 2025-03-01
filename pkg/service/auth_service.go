@@ -2,7 +2,7 @@ package service
 
 import (
 	"fib/config"
-	"fib/entity"
+	"fib/pkg/entity"
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"

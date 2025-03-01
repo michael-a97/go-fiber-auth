@@ -2,7 +2,7 @@ package database
 
 import (
 	"fib/config"
-	"fib/entity"
+	"fib/pkg/entity"
 	"fmt"
 	"log"
 
@@ -11,7 +11,6 @@ import (
 )
 
 func ConnectDB() *gorm.DB {
-
 	dsn := fmt.Sprintf("postgres://%s:%s@%s:%s/%s",
 		config.Config("dbUser"),
 		config.Config("dbPassword"),
@@ -27,5 +26,5 @@ func ConnectDB() *gorm.DB {
 	log.Println("Connected to the database.")
 	db.AutoMigrate(&entity.User{})
 
-	return db 
+	return db
 }

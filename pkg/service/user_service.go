@@ -1,8 +1,8 @@
 package service
 
 import (
-	"fib/entity"
-	"fib/repository"
+	"fib/pkg/entity"
+	"fib/pkg/repository"
 
 	"golang.org/x/crypto/bcrypt"
 )
@@ -11,6 +11,7 @@ type UserService interface {
 	HashPassword(password string) (string, error)
 	FindUserByUsername(username string) (*entity.User, error)
 	FindUserById(id int64) (*entity.User, error)
+	CreateUser(user entity.User) error
 }
 
 type userService struct {
@@ -34,4 +35,8 @@ func (s *userService) FindUserByUsername(username string) (*entity.User, error) 
 
 func (s *userService) FindUserById(id int64) (*entity.User, error) {
 	return s.userRepository.FindUserById(id)
+}
+
+func (s *userService) CreateUser(user entity.User) error{
+	return s.userRepository.CreateUser(user)
 }

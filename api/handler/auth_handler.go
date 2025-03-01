@@ -1,8 +1,8 @@
 package handler
 
 import (
-	"fib/entity"
-	"fib/service"
+	"fib/pkg/entity"
+	"fib/pkg/service"
 	"github.com/gofiber/fiber/v2"
 )
 

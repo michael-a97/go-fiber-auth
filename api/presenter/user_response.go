@@ -1,4 +1,4 @@
-package dto
+package presenter
 
 type UserResponseDto struct {
 	Username  string `json:"username"`
